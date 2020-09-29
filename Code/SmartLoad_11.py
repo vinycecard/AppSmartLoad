@@ -1,51 +1,16 @@
 import numpy as np
 import math
 import sys
-import motion
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlb
 from matplotlib import pylab
 from pylab import *
 from time import sleep
-import console
-import sound
-from midiutil.MidiFile import MIDIFile
 
-# Configure a MIDI file with one track:
-midi = MIDIFile(1, adjust_origin=True)
-midi.addTempo(0, 0, 250)
-
-# Select a instrument:
-midi.addProgramChange(0, 0, 0, 17)
-# Generate some random notes:
-duration_bip = 1/250
-delay=12
-volume=100;
 ######################################
 Load=50;#######Load in Kilos #########
 ######################################
 t=0
-c_major = [60, 62, 64, 65, 67, 69, 71]
-
-midi.addNote(0, 0, 71, 250 * duration_bip*delay, duration_bip*25, volume)
-
-midi.addNote(0, 0, 69, 251 * duration_bip*delay, duration_bip*25, volume)
-
-midi.addNote(0, 0, 67, 252 * duration_bip*delay, duration_bip*25, volume)
-
-midi.addNote(0, 0, 65, 253 * duration_bip*delay, duration_bip*25, volume)
-
-midi.addNote(0, 0, 64, 254 * duration_bip*delay, duration_bip, volume)
-
-midi.addNote(0, 0, 62, 255 * duration_bip*delay, duration_bip*3*25, volume)
-
-midi.addNote(0, 0, 60, 256 * duration_bip*delay, duration_bip*4*25, volume)
-
-midi.addNote(0, 0, 198, 257 * duration_bip*delay, duration_bip*18*25, volume)
-	
-# Write output file:
-with open('output.mid', 'wb') as f:
-	midi.writeFile(f)
 
 num_samples=fs=duration=0;
 num_samples_2=0;
@@ -147,7 +112,7 @@ del v_R,data_v_R
 del data_v_R_x,data_v_R_y,data_v_R_z
 del f_ac_R_x,Pxx_den_ac_R_x
 ###########################################################################################################################	
-console.alert('Calibração', 'Clique em Continuar para calibrar.','Continuar')
+print('Calibração')
 plotar_analise_espectral=0 #1 para fazer análise espectral
 plotar_fig_4=0 #1 para plotar
 plotar_fig_5=0 #1 para plotar
@@ -165,7 +130,8 @@ amostra_corte=int(fs*tempo_corte)
 passar_stop_band=0;#0 para ñ e 1 para Sim
 num_samples_cal = (fs*duration_cal)+1
 num_samples = (fs*duration)+1
-motion.start_updates()
+# TODO trocar motion pela classe que pega as informações de gravidade/angulos do celeular
+#motion.start_updates()
 sleep(0.5)
 print('Gravando calibração estática...')
 data_ang_cal_z=[]
@@ -175,7 +141,7 @@ data_gy=[]
 data_gz=[]
 data_ac=[]
 data_ac_x=data_ac_y=data_ac_z=[]
-ang=[]
+ang=[0,0,0]
 ang_x=ang_y=ang_z=[] 
 data_ang=[]
 data_ang_x=[]
@@ -212,16 +178,19 @@ f_ac_R_x=[]
 Pxx_den_ac_R_x=[]
 
 for i in range(num_samples_cal):
-	sleep(1/fs)
-	ang_cal_x,ang_cal_y,ang_cal_z=motion.get_attitude()
-	g = motion.get_gravity();
-	data_ang_cal_z.append(ang_cal_z)
+	sleep(1/fs);
+	ang_cal_z = 0;
+	g = [10,10,10];
+	#ang_cal_x,ang_cal_y,ang_cal_z=motion.get_attitude();
+	#g = motion.get_gravity();
+	data_ang_cal_z.append(ang_cal_z);
 	gx,gy,gz=g;
 	data_g.append(g);
 	data_gx.append(gx);
 	data_gy.append(gy);
 	data_gz.append(gz);
-motion.stop_updates()
+
+#motion.stop_updates()
 
 i_values_cal = [i/fs for i in 
 range(num_samples_cal)]
@@ -243,19 +212,19 @@ gres_cal_SI=gres_cal*9.80665
 print('gres_cal_SI = ',gres_cal_SI)
 
 ###################################
-console.alert('Motion Plot', 'When you tap Continue, accelerometer (motion) data will be recorded for 10 seconds.', 'Continue')
-motion.start_updates()
+print('Motion Plot: accelerometer (motion) data will be recorded for 10 seconds.')
+#motion.start_updates()
 sleep(2)
 print('Gravando dados do movimento...')
-# Play the BIP: #######################
-player = sound.MIDIPlayer('output.mid')
-player.play()
+# TODO Play the BIP: #######################
+
 for i1 in range(num_samples):
 	#if i==amostra_inicio_real:
 		#print('Início da Gravação...')
 	sleep(1/fs)
-	ac=motion.get_user_acceleration();
-	ang=motion.get_attitude();
+	ac = [0,0,0];
+	#ac=motion.get_user_acceleration();
+	#ang=motion.get_attitude();
 	
 	ang_x=ang[1]  # Pitch = + X
 	ang_y=ang[0];  # Pitch = + Y
@@ -320,7 +289,7 @@ for i1 in range(num_samples):
 	data_ac_R_y.append(ac_R_y);
 	data_ac_R_z.append(ac_R_z);
 
-motion.stop_updates()
+#motion.stop_updates()
 print('Capture finished, plotting...')
 print('############################')
 #print('max_ac_z = ',max(data_ac_R_z))
@@ -404,7 +373,9 @@ def filtfilt_sarmet(x,y,fc_1,fc_2,reg,Lv_reg,Exp_reg):
 				ma=np.matrix(-a[0,np.arange(1,min(La,n+1),1)])
 				myfilt=np.matrix(yfilt[np.arange(n-1,max(-1,n-La),-1)])
 				myfilt=np.transpose(myfilt)
-				yfilt[n]=[mb*my+ma*myfilt]/a[0,0]
+				# TODO descobrir pq está dando erro
+				#yfilt[n]=[mb*my+ma*myfilt]/a[0,0]
+				yfilt[0];
 						
 	yfiltfilt=list(reversed(yfilt))
 	#fig_1a=plt.figure()
@@ -1003,9 +974,16 @@ std_picos_Fz=std(vetor_picos_Fz)
 std_picos_Vz=std(vetor_picos_Vz)
 std_picos_Pz=std(vetor_picos_Pz)
 
-max_picos_Fz=max(vetor_picos_Fz)
-max_picos_Vz=max(vetor_picos_Vz)
-max_picos_Pz=max(vetor_picos_Pz)
+max_picos_Fz = 0;
+max_picos_Vz = 0;
+max_picos_Pz = 0;
+
+if vetor_picos_Fz:
+	max_picos_Fz=max(vetor_picos_Fz)
+if vetor_picos_Vz:
+	max_picos_Vz=max(vetor_picos_Vz)
+if vetor_picos_Pz:
+	max_picos_Pz=max(vetor_picos_Pz)
 
 ######## Imprimir Resultados ########
 print('#############################')
