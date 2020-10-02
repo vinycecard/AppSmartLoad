@@ -1,0 +1,101 @@
+WindowManager:
+    MainWindow:
+    CalibrateWindow:
+    StartWindow:
+
+<Button>
+    font_size: 40
+    color: (0.3,0.6,0.7,1)
+    background_color: (0.3,.4,.5,1)
+
+<MainWindow>:
+    name: "main"
+
+    GridLayout:
+        cols:1
+
+        GridLayout:
+            cols: 1
+            
+            Label:
+                text: "App Smart Load"
+                font_size: 40                
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: "Load [Kg]: "
+                font_size: 20      
+                
+            TextInput:
+                id: load
+                multiline: False
+                font_size: 20
+                input_filter: 'float'
+            
+            Label:
+                text: "Name: "
+                font_size: 20
+                
+            TextInput:
+                id: name
+                multiline: False
+                font_size: 20
+
+            Label:
+                text: "Email: "
+                font_size: 20
+                
+            TextInput:
+                id: email
+                multiline: False
+                font_size: 20
+            
+        
+        GridLayout:
+            cols: 2
+
+            Button:
+                text: "Calibrate"
+                on_release:
+                    app.root.current = "calibrate" if float(load.text) > 0 else "main"
+                    root.manager.transition.direction = "left"
+            Button:
+                text: "Start"
+                on_release:
+                    app.root.current = "start" if float(load.text) > 0 else "main"
+                    root.manager.transition.direction = "left"
+
+
+<CalibrateWindow>:
+    name: "calibrate"
+
+    GridLayout:
+        cols:1
+
+        Label:
+            text: "Smart Load calibrating..."
+            font_size: 40
+
+        Button:
+            text: "Go Back"
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "right"
+
+<StartWindow>:
+    name: "start"
+
+    GridLayout:
+        cols:1
+
+        Label:
+            text: "Smart Load starting..."
+            font_size: 40
+
+        Button:
+            text: "Go Back"
+            on_release:
+                app.root.current = "main"
+                root.manager.transition.direction = "right"
