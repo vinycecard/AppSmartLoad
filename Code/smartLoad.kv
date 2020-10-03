@@ -1,7 +1,4 @@
-WindowManager:
-    MainWindow:
-    CalibrateWindow:
-    StartWindow:
+#:kivy v1.11.1
 
 <Button>
     font_size: 40
@@ -10,6 +7,10 @@ WindowManager:
 
 <MainWindow>:
     name: "main"
+
+    username: username
+    email: email
+    load: load
 
     GridLayout:
         cols:1
@@ -39,7 +40,7 @@ WindowManager:
                 font_size: 20
                 
             TextInput:
-                id: name
+                id: username
                 multiline: False
                 font_size: 20
 
@@ -59,14 +60,13 @@ WindowManager:
             Button:
                 text: "Calibrate"
                 on_release:
-                    app.root.current = "calibrate" if float(load.text) > 0 else "main"
                     root.manager.transition.direction = "left"
+                    app.root.current = "calibrate" if root.isValidLoad() else "main"
             Button:
                 text: "Start"
                 on_release:
-                    app.root.current = "start" if float(load.text) > 0 else "main"
+                    app.root.current = "start" if root.isValidLoad() else "main"
                     root.manager.transition.direction = "left"
-
 
 <CalibrateWindow>:
     name: "calibrate"
